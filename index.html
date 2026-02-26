@@ -368,7 +368,7 @@ header p { color: var(--text-muted); font-size: 15px; }
 <div class="container">
   <header>
     <h1>Mental Models Map</h1>
-    <p>62 models — your personal operating system</p>
+    <p>64 models — your personal operating system</p>
     <div class="header-actions">
       <button class="btn" onclick="openSearch()">🔍 Search <kbd>⌘K</kbd></button>
       <button class="btn" onclick="randomWisdom()">✦ Random Wisdom</button>
@@ -466,6 +466,8 @@ const models = [
   {id:60,name:"Praise Before Criticism",cat:"Wisdom",insight:"A mind that feels seen and appreciated is open to growth. A mind under attack closes.",when:"Reviewing your work, giving feedback, self-evaluation.",owned:true,clusters:["inner"]},
   {id:61,name:"Radical Honesty With Self",cat:"Wisdom",insight:"You can't fix what you won't face. Honesty is the prerequisite for all growth.",when:"You're rationalizing, avoiding, or performing 'fine.'",owned:true,clusters:["connection","inner"]},
   {id:62,name:"Present Moment Focus",cat:"Wisdom",insight:"You only ever have to handle THIS moment. And you can always handle this moment.",when:"Ruminating, catastrophizing, spiraling.",owned:true,clusters:["foundation"]},
+  {id:63,name:"Empty Productivity Trap",cat:"Wisdom",insight:"If it's not outreach, closing, or building something a client would pay for — it's not needle-moving work. Everything else is maintenance or play. Name it honestly.",when:"You've been 'working' all day but can't name one thing that could lead to money in your account.",owned:true,clusters:["action","builder"]},
+  {id:64,name:"Environmental Mimicry Trap",cat:"Wisdom",insight:"Most people performing hustle aren't winning — they're coping. The ones actually building wealth work fewer focused hours, play more, and look calm. Mimic them, not the grinders.",when:"You're staying late because everyone else is, or doing what looks impressive rather than what's effective.",owned:true,clusters:["identity","builder"]},
 ];
 
 const clusters = [
@@ -491,6 +493,8 @@ const triggers = [
   {feeling:"Low energy / burned out",models:"⭐ Non-Negotiables, Energy Mgmt, Ultradian Rhythms"},
   {feeling:"Avoiding something",models:"⭐ Avoidance-Shame Spiral, Second-Order Thinking"},
   {feeling:"Everything feels pointless",models:"Memento Mori, Logotherapy, ⭐ Momentum"},
+  {feeling:"Busy but nothing moved",models:"⭐ Empty Productivity Trap, 80/20, Deep Work, Essentialism"},
+  {feeling:"Mimicking the grind",models:"⭐ Environmental Mimicry Trap, ⭐ Ego Is the Enemy, ⭐ Calm Mind + Full Speed"},
 ];
 
 // Render triggers
@@ -598,7 +602,7 @@ document.getElementById('searchInput').addEventListener('input', e => renderSear
 
 function renderSearchResults(q) {
   const r = document.getElementById('searchResults');
-  if (!q.trim()) { r.innerHTML = '<div class="search-empty">Type to search 62 models...</div>'; return; }
+  if (!q.trim()) { r.innerHTML = '<div class="search-empty">Type to search 64 models...</div>'; return; }
   const ql = q.toLowerCase();
   const matches = models.filter(m => m.name.toLowerCase().includes(ql) || m.insight.toLowerCase().includes(ql) || m.when.toLowerCase().includes(ql) || m.cat.toLowerCase().includes(ql));
   if (!matches.length) { r.innerHTML = '<div class="search-empty">No models found</div>'; return; }
