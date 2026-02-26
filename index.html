@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owen's Mental Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --card: #141414;
+  --card-hover: #1a1a1a;
+  --border: #262626;
+  --border-light: #333;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
+  --text-dim: #71717a;
+  --gold: #f59e0b;
+  --gold-muted: #92400e;
+  --gold-bg: rgba(245, 158, 11, 0.08);
+  --action: #3b82f6;
+  --action-muted: #1e3a5f;
+  --inner: #a78bfa;
+  --inner-muted: #4c1d95;
+  --stoic: #6ee7b7;
+  --stoic-muted: #065f46;
+  --builder: #f472b6;
+  --builder-muted: #831843;
+  --foundation: #fb923c;
+  --foundation-muted: #7c2d12;
+  --identity: #38bdf8;
+  --identity-muted: #0c4a6e;
+  --connection: #e879f9;
+  --connection-muted: #701a75;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Geist', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Search Modal */
+.search-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20vh;
+}
+.search-overlay.active { display: flex; }
+.search-box {
+  width: min(560px, 90vw);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+.search-input {
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'Geist', sans-serif;
+  font-size: 16px;
+  outline: none;
+}
+.search-input::placeholder { color: var(--text-dim); }
+.search-results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+}
+.search-result {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.15s;
+}
+.search-result:hover, .search-result.selected { background: var(--card-hover); }
+.search-result .sr-name { font-weight: 500; }
+.search-result .sr-cat { font-size: 12px; color: var(--text-dim); font-family: 'Geist Mono', monospace; }
+.search-result .sr-star { color: var(--gold); }
+.search-empty { padding: 20px; text-align: center; color: var(--text-dim); font-size: 14px; }
+
+/* Layout */
+.container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 80px; }
+
+/* Header */
+header {
+  text-align: center;
+  padding: 48px 0 32px;
+}
+header h1 {
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 8px;
+}
+header p { color: var(--text-muted); font-size: 15px; }
+.header-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-muted);
+  font-family: 'Geist', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--card-hover); color: var(--text); border-color: var(--border-light); }
+.btn kbd {
+  font-family: 'Geist Mono', monospace;
+  font-size: 11px;
+  background: var(--bg);
+  padding: 2px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+/* Section titles */
+.section-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  margin: 48px 0 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Trigger Table */
+.trigger-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 8px;
+}
+.trigger-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+  cursor: default;
+}
+.trigger-row:hover { border-color: var(--border-light); background: var(--card-hover); }
+.trigger-feeling {
+  font-size: 13px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+.trigger-arrow { color: var(--text-dim); flex-shrink: 0; }
+.trigger-models {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 500;
+}
+.trigger-models .star { color: var(--gold); }
+
+/* Cluster Map */
+.cluster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+.cluster-card {
+  padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.cluster-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--cluster-color);
+  opacity: 0.6;
+  transition: opacity 0.3s;
+}
+.cluster-card:hover { border-color: var(--border-light); transform: translateY(-1px); }
+.cluster-card:hover::before { opacity: 1; }
+.cluster-card.active { border-color: var(--cluster-color); }
+.cluster-card.active::before { opacity: 1; height: 3px; }
+.cluster-name {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cluster-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cluster-color);
+  flex-shrink: 0;
+}
+.cluster-subtitle { font-size: 12px; color: var(--text-dim); margin-bottom: 14px; font-family: 'Geist Mono', monospace; }
+.cluster-models { display: flex; flex-wrap: wrap; gap: 6px; }
+.cluster-tag {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--bg);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.cluster-tag.owned {
+  border-color: var(--gold-muted);
+  color: var(--gold);
+  background: var(--gold-bg);
+}
+
+/* Model Cards */
+.category-section { margin-bottom: 8px; }
+.category-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.category-header:hover { background: var(--card-hover); }
+.category-header h3 { font-size: 14px; font-weight: 600; }
+.category-header .count { font-size: 12px; color: var(--text-dim); font-family: 'Geist Mono', monospace; }
+.category-chevron {
+  transition: transform 0.3s;
+  color: var(--text-dim);
+}
+.category-section.open .category-chevron { transform: rotate(180deg); }
+.category-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+.category-body-inner {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 8px;
+  padding: 8px 0;
+}
+.model-card {
+  padding: 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: all 0.25s;
+}
+.model-card:hover { border-color: var(--border-light); }
+.model-card.owned { border-color: var(--gold-muted); }
+.model-card.highlight {
+  border-color: var(--cluster-color, var(--border-light));
+  background: var(--card-hover);
+}
+.model-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.model-name .star { color: var(--gold); font-size: 14px; }
+.model-insight { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+.model-when {
+  font-size: 12px;
+  color: var(--text-dim);
+  font-family: 'Geist Mono', monospace;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+/* Random Wisdom */
+.wisdom-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 12px 20px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  animation: slideUp 0.3s ease;
+}
+.wisdom-bar.active { display: flex; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.wisdom-text { flex: 1; font-size: 14px; }
+.wisdom-name { font-weight: 600; color: var(--gold); }
+.wisdom-close { cursor: pointer; color: var(--text-dim); padding: 4px; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+@media (max-width: 640px) {
+  .trigger-grid { grid-template-columns: 1fr; }
+  .cluster-grid { grid-template-columns: 1fr; }
+  .category-body-inner { grid-template-columns: 1fr; }
+  .trigger-feeling { min-width: 90px; }
+  header { padding: 32px 0 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <input class="search-input" id="searchInput" placeholder="Search models..." autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+</div>
+
+<div class="wisdom-bar" id="wisdomBar">
+  <div class="wisdom-text"><span class="wisdom-name" id="wisdomName"></span> — <span id="wisdomInsight"></span></div>
+  <div class="wisdom-close" onclick="closeWisdom()">✕</div>
+</div>
+
+<div class="container">
+  <header>
+    <h1>Mental Models Map</h1>
+    <p>62 models — your personal operating system</p>
+    <div class="header-actions">
+      <button class="btn" onclick="openSearch()">🔍 Search <kbd>⌘K</kbd></button>
+      <button class="btn" onclick="randomWisdom()">✦ Random Wisdom</button>
+    </div>
+  </header>
+
+  <div class="section-title">⚡ Quick Triggers — "I'm feeling X → reach for Y"</div>
+  <div class="trigger-grid" id="triggerGrid"></div>
+
+  <div class="section-title">🔗 Overlap Clusters — click to highlight</div>
+  <div class="cluster-grid" id="clusterGrid"></div>
+
+  <div class="section-title">📖 All Models by Category</div>
+  <div id="categoryList"></div>
+</div>
+
+<script>
+const models = [
+  // Classic Mental Models
+  {id:1,name:"First Principles Thinking",cat:"Classic Mental Models",insight:"Most 'rules' are conventions. The real constraints are fewer than you think.",when:"You're stuck, overwhelmed, or copying someone else's playbook.",owned:false,clusters:["builder"]},
+  {id:2,name:"Inversion",cat:"Classic Mental Models",insight:"Avoiding stupidity is easier and more reliable than seeking brilliance.",when:"Planning, decision-making, or when perfectionism is paralyzing you.",owned:false,clusters:["builder"]},
+  {id:3,name:"Circle of Competence",cat:"Classic Mental Models",insight:"Staying inside your circle = leverage. Expanding it deliberately = growth.",when:"Taking on new ventures, comparing yourself to others, imposter syndrome.",owned:false,clusters:["identity"]},
+  {id:4,name:"Second-Order Thinking",cat:"Classic Mental Models",insight:"First-order thinkers chase comfort. Second-order thinkers build futures.",when:"Making a choice that feels good short-term.",owned:false,clusters:["action"]},
+  {id:5,name:"Map Is Not the Territory",cat:"Classic Mental Models",insight:"Update your map constantly. Clinging to an outdated map is ego.",when:"Your assumptions keep proving wrong.",owned:false,clusters:[]},
+  {id:6,name:"Hanlon's Razor",cat:"Classic Mental Models",insight:"Most people aren't thinking about you at all. That's freeing.",when:"Someone ghosts you, a client is difficult, you feel slighted.",owned:false,clusters:["connection"]},
+  {id:7,name:"Opportunity Cost",cat:"Classic Mental Models",insight:"The real cost of anything is what you gave up to get it.",when:"Overcommitting, saying yes to feel needed.",owned:false,clusters:["builder"]},
+  {id:8,name:"Marginal Thinking",cat:"Classic Mental Models",insight:"You don't need to commit to the marathon. Commit to the next step.",when:"Feeling overwhelmed by a big project.",owned:false,clusters:["action"]},
+
+  // Psychology
+  {id:9,name:"CBT — Thought Records",cat:"Psychology",insight:"Your thoughts are not facts. The story you tell yourself is editable.",when:"Spiraling self-criticism, catastrophizing, all-or-nothing thinking.",owned:false,clusters:["inner"]},
+  {id:10,name:"Cognitive Distortions",cat:"Psychology",insight:"Naming the distortion breaks its power. 'Oh, that's just catastrophizing.'",when:"Catch yourself saying 'always,' 'never,' 'I should.'",owned:false,clusters:["inner"]},
+  {id:11,name:"ACT — Psychological Flexibility",cat:"Psychology",insight:"You don't need to feel good to do good. Willingness > motivation.",when:"Avoidance, waiting to 'feel ready,' anxiety before hard conversations.",owned:false,clusters:["action","stoic"]},
+  {id:12,name:"Defusion (ACT)",cat:"Psychology",insight:"You are not your thoughts. You're the one observing them.",when:"A negative thought is running your behavior.",owned:false,clusters:["inner"]},
+  {id:13,name:"Self-Compassion Theory (Neff)",cat:"Psychology",insight:"Treating yourself like a friend isn't weakness — it's the fastest path back to performance.",when:"After failure, mistakes, or when the inner critic is loud.",owned:false,clusters:["inner"]},
+  {id:14,name:"Self-Compassion as Fuel",cat:"Psychology",insight:"Compassion isn't the dessert. It's the fuel in the tank.",when:"You catch yourself thinking 'I'll be kind to myself after I earn it.'",owned:true,clusters:["inner"]},
+  {id:15,name:"Flow States",cat:"Psychology",insight:"Flow isn't magic — it's engineered by matching difficulty to ability.",when:"Work feels boring (too easy) or anxiety-inducing (too hard).",owned:false,clusters:["builder","foundation"]},
+  {id:16,name:"Behavioral Activation",cat:"Psychology",insight:"You don't wait for the engine to warm up — you start driving.",when:"Depression, low motivation, 'I'll do it when I feel like it.'",owned:false,clusters:["action"]},
+  {id:17,name:"Spotlight Effect",cat:"Psychology",insight:"Everyone is the main character of their own movie. You're a background extra.",when:"Fear of posting, shipping, calling, being seen.",owned:false,clusters:["connection"]},
+  {id:18,name:"Hedonic Adaptation",cat:"Psychology",insight:"Neither success nor failure is permanent. Build for the process.",when:"Chasing external wins for happiness.",owned:false,clusters:[]},
+  {id:19,name:"Learned Optimism (Seligman)",cat:"Psychology",insight:"'This is temporary, specific, and not entirely my fault' is usually more accurate.",when:"After repeated failures or rejections.",owned:false,clusters:["inner"]},
+  {id:20,name:"Dual Process Grief Model",cat:"Psychology",insight:"You don't 'get over' grief. You pendulum between feeling it and building forward.",when:"Dealing with loss — of a person, relationship, identity, or chapter.",owned:false,clusters:["stoic"]},
+  {id:21,name:"Window of Tolerance",cat:"Psychology",insight:"The goal isn't to never leave the window — it's to recognize when you have.",when:"You're either wired/anxious or flat/avoidant.",owned:false,clusters:["foundation"]},
+
+  // Stoic
+  {id:22,name:"Dichotomy of Control",cat:"Stoic Philosophy",insight:"Freedom is focusing only on your moves. Everything else is weather.",when:"Anxiety, people-pleasing, obsessing over results.",owned:false,clusters:["stoic"]},
+  {id:23,name:"Amor Fati",cat:"Stoic Philosophy",insight:"'This happened FOR me, not TO me' isn't delusion — it's a choice to extract value.",when:"Something goes wrong that you can't undo.",owned:false,clusters:["stoic"]},
+  {id:24,name:"The Obstacle Is the Way",cat:"Stoic Philosophy",insight:"The hard thing IS the growth. Resistance is the compass.",when:"Facing a problem you want to avoid.",owned:false,clusters:["stoic","action"]},
+  {id:25,name:"Memento Mori",cat:"Stoic Philosophy",insight:"Time is non-renewable. The fear of embarrassment is absurd on a long enough timeline.",when:"Procrastinating, playing small, afraid to start.",owned:false,clusters:["stoic"]},
+  {id:26,name:"Negative Visualization",cat:"Stoic Philosophy",insight:"When you've already 'lived' the worst case, the actual event loses its teeth.",when:"Before a launch, hard conversation, or big decision.",owned:false,clusters:["stoic"]},
+  {id:27,name:"Voluntary Discomfort",cat:"Stoic Philosophy",insight:"If you practice losing, you stop fearing it. Comfort is the real danger.",when:"Getting too comfortable, softening discipline.",owned:false,clusters:["stoic","foundation"]},
+  {id:28,name:"The View From Above",cat:"Stoic Philosophy",insight:"You're a speck on a rock hurtling through space. Act with both humility and freedom.",when:"Ego inflation, catastrophizing, taking yourself too seriously.",owned:false,clusters:["stoic"]},
+  {id:29,name:"The Inner Citadel",cat:"Stoic Philosophy",insight:"Between stimulus and response is a space — that space is your power.",when:"Criticism, chaos, a deal falls through.",owned:false,clusters:["stoic"]},
+
+  // Performance
+  {id:30,name:"Growth Mindset",cat:"Performance Psychology",insight:"'I can't do this YET' changes everything.",when:"After failure, comparing yourself to others.",owned:false,clusters:["identity"]},
+  {id:31,name:"Deliberate Practice",cat:"Performance Psychology",insight:"1 hour of deliberate practice > 10 hours of going through the motions.",when:"You're putting in hours but not improving.",owned:false,clusters:["builder"]},
+  {id:32,name:"Visualization / Mental Rehearsal",cat:"Performance Psychology",insight:"Your brain can't fully distinguish vivid imagination from reality. Use that.",when:"Before sales calls, presentations, hard conversations.",owned:false,clusters:["action"]},
+  {id:33,name:"Pre-Performance Routines",cat:"Performance Psychology",insight:"Routines reduce decision fatigue and trigger 'performance mode' automatically.",when:"Before any high-stakes activity.",owned:false,clusters:["foundation"]},
+  {id:34,name:"10-Second Hype Before Action",cat:"Performance Psychology",insight:"You don't need sustained motivation. You need 10 seconds of ignition.",when:"The moment of resistance — right before you start.",owned:true,clusters:["action"]},
+  {id:35,name:"Deep Work",cat:"Performance Psychology",insight:"3 hours of deep work > 8 hours of shallow busyness.",when:"You're busy all day but nothing meaningful gets done.",owned:false,clusters:["builder"]},
+
+  // Entrepreneurial
+  {id:36,name:"80/20 Principle",cat:"Entrepreneurial Wisdom",insight:"Find the 20% and go all-in. Let the rest be 'good enough.'",when:"Overwhelmed with tasks, not sure what to prioritize.",owned:false,clusters:["builder"]},
+  {id:37,name:"Ship > Perfect",cat:"Entrepreneurial Wisdom",insight:"Perfectionism is fear wearing a productivity mask. Ship it, learn, iterate.",when:"Perfectionism disguising itself as quality standards.",owned:false,clusters:["action","builder"]},
+  {id:38,name:"Lean Startup / Build-Measure-Learn",cat:"Entrepreneurial Wisdom",insight:"Your assumptions are probably wrong. Find out fast and cheap.",when:"Building anything — products, offers, content.",owned:false,clusters:["builder"]},
+  {id:39,name:"Essentialism",cat:"Entrepreneurial Wisdom",insight:"If it isn't a clear YES, it's a NO.",when:"Saying yes to everything, losing focus.",owned:false,clusters:["builder"]},
+  {id:40,name:"Scarcity vs Abundance Mindset",cat:"Entrepreneurial Wisdom",insight:"Scarcity contracts your world. Abundance expands it. You choose the lens.",when:"Comparing to competitors, fearing loss.",owned:true,clusters:["identity"]},
+  {id:41,name:"Skin in the Game",cat:"Entrepreneurial Wisdom",insight:"Don't trust anyone who doesn't eat their own cooking.",when:"Choosing partners/clients, evaluating advice.",owned:false,clusters:[]},
+
+  // Emotional & Relational
+  {id:42,name:"Vulnerability as Strength",cat:"Emotional & Relational",insight:"The people who matter will draw closer when you're real.",when:"Hiding struggles, performing 'fine,' isolating.",owned:false,clusters:["connection"]},
+  {id:43,name:"Shame Resilience",cat:"Emotional & Relational",insight:"Shame dies when spoken to empathy. Guilt = 'I did bad.' Shame = 'I AM bad.'",when:"You feel fundamentally flawed, not just like you made a mistake.",owned:false,clusters:["connection","inner"]},
+  {id:44,name:"Avoidance-Shame Spiral",cat:"Emotional & Relational",insight:"The action is almost always less painful than the spiral. Do the thing. Feel after.",when:"You've been putting off a text, email, or conversation.",owned:true,clusters:["action","connection"]},
+  {id:45,name:"Attachment Theory",cat:"Emotional & Relational",insight:"Earned secure attachment is possible at any age through consistent safe relationships.",when:"Noticing patterns — clinging, withdrawing, fear.",owned:false,clusters:["connection"]},
+  {id:46,name:"Bids for Connection (Gottman)",cat:"Emotional & Relational",insight:"Love isn't grand gestures. It's turning toward small bids consistently.",when:"Feeling disconnected in relationships.",owned:false,clusters:["connection"]},
+  {id:47,name:"Boundaries as Self-Respect",cat:"Emotional & Relational",insight:"'No' is a complete sentence. Clear is kind.",when:"People-pleasing, overgiving, resentment building.",owned:false,clusters:["connection"]},
+
+  // Energy
+  {id:48,name:"Energy Management > Time Management",cat:"Energy Management",insight:"Time is fixed. Energy is renewable — but only if you manage recovery.",when:"You have 'time' but no gas in the tank.",owned:false,clusters:["foundation"]},
+  {id:49,name:"Ultradian Rhythms",cat:"Energy Management",insight:"Work in 90-min sprints, rest 15-20 min. You're not lazy — you're biological.",when:"Planning work blocks, wondering why you crash at 2pm.",owned:false,clusters:["foundation"]},
+  {id:50,name:"Non-Negotiables Foundation",cat:"Energy Management",insight:"Skip these and everything degrades. Protect these and everything elevates.",when:"Always. Especially when you 'don't have time.'",owned:true,clusters:["foundation"]},
+
+  // Identity
+  {id:51,name:"Identity-Based Habits",cat:"Identity Models",insight:"Every action is a vote for the person you're becoming. Cast better votes.",when:"Building new habits, breaking old ones.",owned:false,clusters:["identity"]},
+  {id:52,name:"Identity Anchors (Say It Out Loud)",cat:"Identity Models",insight:"Speaking identity out loud moves it from thought to commitment.",when:"Doubt, wavering, before action.",owned:true,clusters:["identity","inner"]},
+  {id:53,name:"Be > Do > Have",cat:"Identity Models",insight:"Embody the identity now. Act from it. Results follow.",when:"Chasing external markers, feeling like you need permission.",owned:false,clusters:["identity"]},
+  {id:54,name:"Prototype Mindset",cat:"Identity Models",insight:"Prototypes aren't judged for being imperfect — they're celebrated for existing.",when:"Self-criticism after failure, feeling 'behind.'",owned:false,clusters:["identity"]},
+  {id:55,name:"Ego Is the Enemy",cat:"Identity Models",insight:"Stay a student. The moment you think you've arrived, you've stopped growing.",when:"Succeeding, failing, or learning — ego distorts all three.",owned:true,clusters:["identity"]},
+
+  // Additional
+  {id:56,name:"Logotherapy (Frankl)",cat:"Wisdom",insight:"Those who have a WHY can bear almost any HOW.",when:"Grief, suffering, feeling pointless, dark nights of the soul.",owned:false,clusters:["stoic"]},
+  {id:57,name:"Calm Mind + Full Speed",cat:"Wisdom",insight:"Panic ≠ urgency. The best performers are calm inside while executing at full speed.",when:"Feeling like you must choose between peace and performance.",owned:true,clusters:["foundation","builder"]},
+  {id:58,name:"Momentum = Positive Loops",cat:"Wisdom",insight:"You don't need a big win. You need a tiny win, then another. Compound interest for behavior.",when:"Starting from zero, rebuilding after a setback.",owned:true,clusters:["action"]},
+  {id:59,name:"Daily Wins Log",cat:"Wisdom",insight:"Your brain has a negativity bias. The log is a manual override — proof you're moving.",when:"End of day, or when you feel like you accomplished nothing.",owned:true,clusters:["action","inner"]},
+  {id:60,name:"Praise Before Criticism",cat:"Wisdom",insight:"A mind that feels seen and appreciated is open to growth. A mind under attack closes.",when:"Reviewing your work, giving feedback, self-evaluation.",owned:true,clusters:["inner"]},
+  {id:61,name:"Radical Honesty With Self",cat:"Wisdom",insight:"You can't fix what you won't face. Honesty is the prerequisite for all growth.",when:"You're rationalizing, avoiding, or performing 'fine.'",owned:true,clusters:["connection","inner"]},
+  {id:62,name:"Present Moment Focus",cat:"Wisdom",insight:"You only ever have to handle THIS moment. And you can always handle this moment.",when:"Ruminating, catastrophizing, spiraling.",owned:true,clusters:["foundation"]},
+];
+
+const clusters = [
+  {id:"action",name:"The Action Cluster",sub:"when you can't start",color:"#3b82f6",models:["10-Second Hype Before Action","Behavioral Activation","Avoidance-Shame Spiral","Ship > Perfect","Momentum = Positive Loops"]},
+  {id:"inner",name:"The Inner Game",sub:"when the critic is loud",color:"#a78bfa",models:["CBT — Thought Records","Cognitive Distortions","Defusion (ACT)","Self-Compassion as Fuel","Praise Before Criticism","Identity Anchors (Say It Out Loud)"]},
+  {id:"stoic",name:"The Stoic Backbone",sub:"when life hits hard",color:"#6ee7b7",models:["Dichotomy of Control","Amor Fati","The Obstacle Is the Way","Memento Mori","The Inner Citadel","Logotherapy (Frankl)"]},
+  {id:"builder",name:"The Builder Cluster",sub:"when building feels overwhelming",color:"#f472b6",models:["First Principles Thinking","Lean Startup / Build-Measure-Learn","80/20 Principle","Ship > Perfect","Calm Mind + Full Speed","Deep Work"]},
+  {id:"foundation",name:"The Foundation",sub:"when everything feels off",color:"#fb923c",models:["Non-Negotiables Foundation","Energy Management > Time Management","Window of Tolerance","Ultradian Rhythms","Present Moment Focus"]},
+  {id:"identity",name:"The Identity Cluster",sub:"when you don't know who you are",color:"#38bdf8",models:["Identity Anchors (Say It Out Loud)","Be > Do > Have","Identity-Based Habits","Ego Is the Enemy","Prototype Mindset","Growth Mindset"]},
+  {id:"connection",name:"The Connection Cluster",sub:"when isolation creeps in",color:"#e879f9",models:["Vulnerability as Strength","Shame Resilience","Attachment Theory","Boundaries as Self-Respect","Radical Honesty With Self"]},
+];
+
+const triggers = [
+  {feeling:"Paralyzed / can't start",models:"⭐ 10-Second Hype, Behavioral Activation"},
+  {feeling:"Self-critical",models:"⭐ Self-Compassion as Fuel, ⭐ Praise Before Criticism, Defusion"},
+  {feeling:"Afraid of judgment",models:"Spotlight Effect, Memento Mori, Dichotomy of Control"},
+  {feeling:"Overwhelmed",models:"80/20, Essentialism, Marginal Thinking"},
+  {feeling:"Comparing to others",models:"Circle of Competence, ⭐ Scarcity vs Abundance, Growth Mindset"},
+  {feeling:"Grieving / in pain",models:"Dual Process, Logotherapy, Amor Fati, ACT"},
+  {feeling:"Isolated / alone",models:"Vulnerability, Shame Resilience, Bids for Connection"},
+  {feeling:"Lost / no direction",models:"Logotherapy, Be > Do > Have, ⭐ Identity Anchors"},
+  {feeling:"Ego inflated or deflated",models:"⭐ Ego Is the Enemy, View From Above, Prototype Mindset"},
+  {feeling:"Low energy / burned out",models:"⭐ Non-Negotiables, Energy Mgmt, Ultradian Rhythms"},
+  {feeling:"Avoiding something",models:"⭐ Avoidance-Shame Spiral, Second-Order Thinking"},
+  {feeling:"Everything feels pointless",models:"Memento Mori, Logotherapy, ⭐ Momentum"},
+];
+
+// Render triggers
+const tg = document.getElementById('triggerGrid');
+triggers.forEach(t => {
+  const html = t.models.replace(/⭐/g, '<span class="star">⭐</span>');
+  tg.innerHTML += `<div class="trigger-row"><span class="trigger-feeling">${t.feeling}</span><span class="trigger-arrow">→</span><span class="trigger-models">${html}</span></div>`;
+});
+
+// Render clusters
+let activeCluster = null;
+const cg = document.getElementById('clusterGrid');
+clusters.forEach(c => {
+  const tags = c.models.map(m => {
+    const md = models.find(x => x.name === m);
+    const owned = md && md.owned;
+    return `<span class="cluster-tag${owned ? ' owned' : ''}">${owned ? '⭐ ' : ''}${m}</span>`;
+  }).join('');
+  cg.innerHTML += `<div class="cluster-card" data-cluster="${c.id}" style="--cluster-color:${c.color}" onclick="toggleCluster('${c.id}')">
+    <div class="cluster-name"><span class="cluster-dot"></span>${c.name}</div>
+    <div class="cluster-subtitle">${c.sub}</div>
+    <div class="cluster-models">${tags}</div>
+  </div>`;
+});
+
+function toggleCluster(id) {
+  const cards = document.querySelectorAll('.cluster-card');
+  const modelCards = document.querySelectorAll('.model-card');
+  if (activeCluster === id) {
+    activeCluster = null;
+    cards.forEach(c => c.classList.remove('active'));
+    modelCards.forEach(c => { c.classList.remove('highlight'); c.style.removeProperty('--cluster-color'); });
+    return;
+  }
+  activeCluster = id;
+  const cluster = clusters.find(c => c.id === id);
+  cards.forEach(c => c.classList.toggle('active', c.dataset.cluster === id));
+  modelCards.forEach(c => {
+    const mName = c.dataset.name;
+    const inCluster = cluster.models.includes(mName);
+    c.classList.toggle('highlight', inCluster);
+    if (inCluster) c.style.setProperty('--cluster-color', cluster.color);
+    else c.style.removeProperty('--cluster-color');
+  });
+  // Open relevant categories
+  if (cluster) {
+    const relevantModels = models.filter(m => cluster.models.includes(m.name));
+    const cats = [...new Set(relevantModels.map(m => m.cat))];
+    cats.forEach(cat => {
+      const sec = document.querySelector(`.category-section[data-cat="${cat}"]`);
+      if (sec && !sec.classList.contains('open')) sec.querySelector('.category-header').click();
+    });
+  }
+}
+
+// Render categories
+const catOrder = ["Classic Mental Models","Psychology","Stoic Philosophy","Performance Psychology","Entrepreneurial Wisdom","Emotional & Relational","Energy Management","Identity Models","Wisdom"];
+const cl = document.getElementById('categoryList');
+catOrder.forEach(cat => {
+  const catModels = models.filter(m => m.cat === cat);
+  const sec = document.createElement('div');
+  sec.className = 'category-section';
+  sec.dataset.cat = cat;
+  const cards = catModels.map(m => `<div class="model-card${m.owned ? ' owned' : ''}" data-name="${m.name}" data-id="${m.id}">
+    <div class="model-name">${m.owned ? '<span class="star">⭐</span>' : ''}${m.name}</div>
+    <div class="model-insight">${m.insight}</div>
+    <div class="model-when">↳ ${m.when}</div>
+  </div>`).join('');
+  sec.innerHTML = `<div class="category-header" onclick="toggleCat(this)">
+    <h3>${cat} <span class="count">${catModels.length}</span></h3>
+    <svg class="category-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </div>
+  <div class="category-body"><div class="category-body-inner">${cards}</div></div>`;
+  cl.appendChild(sec);
+});
+
+function toggleCat(header) {
+  const sec = header.parentElement;
+  const body = sec.querySelector('.category-body');
+  if (sec.classList.contains('open')) {
+    body.style.maxHeight = '0';
+    sec.classList.remove('open');
+  } else {
+    sec.classList.add('open');
+    body.style.maxHeight = body.scrollHeight + 'px';
+  }
+}
+
+// Search
+function openSearch() {
+  const o = document.getElementById('searchOverlay');
+  o.classList.add('active');
+  document.getElementById('searchInput').value = '';
+  document.getElementById('searchInput').focus();
+  renderSearchResults('');
+}
+function closeSearch() { document.getElementById('searchOverlay').classList.remove('active'); }
+
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeSearch();
+});
+document.getElementById('searchOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeSearch(); });
+document.getElementById('searchInput').addEventListener('input', e => renderSearchResults(e.target.value));
+
+function renderSearchResults(q) {
+  const r = document.getElementById('searchResults');
+  if (!q.trim()) { r.innerHTML = '<div class="search-empty">Type to search 62 models...</div>'; return; }
+  const ql = q.toLowerCase();
+  const matches = models.filter(m => m.name.toLowerCase().includes(ql) || m.insight.toLowerCase().includes(ql) || m.when.toLowerCase().includes(ql) || m.cat.toLowerCase().includes(ql));
+  if (!matches.length) { r.innerHTML = '<div class="search-empty">No models found</div>'; return; }
+  r.innerHTML = matches.slice(0, 12).map(m => `<div class="search-result" onclick="goToModel(${m.id})">
+    <span>${m.owned ? '<span class="sr-star">⭐</span>' : ''}</span>
+    <span class="sr-name">${m.name}</span>
+    <span class="sr-cat">${m.cat}</span>
+  </div>`).join('');
+}
+
+function goToModel(id) {
+  closeSearch();
+  const card = document.querySelector(`.model-card[data-id="${id}"]`);
+  if (!card) return;
+  const sec = card.closest('.category-section');
+  if (!sec.classList.contains('open')) sec.querySelector('.category-header').click();
+  setTimeout(() => {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    card.style.transition = 'box-shadow 0.3s';
+    card.style.boxShadow = '0 0 0 2px var(--gold)';
+    setTimeout(() => card.style.boxShadow = '', 2000);
+  }, 100);
+}
+
+// Random Wisdom
+function randomWisdom() {
+  const m = models[Math.floor(Math.random() * models.length)];
+  document.getElementById('wisdomName').textContent = (m.owned ? '⭐ ' : '') + m.name;
+  document.getElementById('wisdomInsight').textContent = m.insight;
+  document.getElementById('wisdomBar').classList.add('active');
+}
+function closeWisdom() { document.getElementById('wisdomBar').classList.remove('active'); }
+</script>
+</body>
+</html>
