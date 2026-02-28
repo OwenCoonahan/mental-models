@@ -419,6 +419,17 @@ header p { color: var(--text-muted); font-size: 15px; }
   background: var(--border);
   flex-shrink: 0;
 }
+.pyramid-toggle.active { background: var(--card-hover); color: var(--text); border-color: var(--border-light); }
+.pyramid-ideal .pyramid-detail { color: var(--text); }
+.pyramid-ideal .pyramid-action { color: var(--stoic); }
+.pyramid-ideal .pyramid-identity {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--gold);
+  font-style: italic;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
@@ -458,7 +469,13 @@ header p { color: var(--text-muted); font-size: 15px; }
     </div>
   </header>
 
-  <div class="section-title">🔺 Owen's Life Pyramid — bottom up, fix the foundation first</div>
+  <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+    <span>🔺 Owen's Life Pyramid</span>
+    <div style="display:flex;gap:6px;">
+      <button class="btn pyramid-toggle active" data-mode="current" onclick="setPyramidMode('current')">🔴 Current</button>
+      <button class="btn pyramid-toggle" data-mode="ideal" onclick="setPyramidMode('ideal')">🟢 Ideal</button>
+    </div>
+  </div>
   <div class="pyramid-wrapper" id="pyramidWrapper"></div>
 
   <div class="section-title">⚡ Quick Triggers — "I'm feeling X → reach for Y"</div>
@@ -730,7 +747,12 @@ const pyramidLevels = [
     blockers: ["Every layer below this needs to stabilize first", "Can't build the vision on a shaky foundation"],
     actions: ["Build the 10/5/1/6yr plan with exact metrics + funnel math", "Revisit monthly — is the pyramid getting stronger?"],
     models: ["Logotherapy (Frankl)", "Be > Do > Have", "Second-Order Thinking"],
-    color: "#a78bfa", width: "45%"
+    color: "#a78bfa", width: "45%",
+    idealIdentity: "\"I am building a life of freedom, impact, and abundance. Every day I'm closer. I don't hope for it — I engineer it.\"",
+    idealStatus: "LOCKED IN", idealStatusClass: "solid",
+    idealSubtitle: "Crystal clear vision, working backward from it daily",
+    idealDetail: "<strong>I see it clearly:</strong> Running Prospector Labs from anywhere — NYC, LA, wherever I choose. Real estate portfolio growing. Deep relationship with a partner who matches my energy. Greek god body. Personal brand that opens any door. The electrical grid is better because I exist. My mom would be proud.",
+    idealTraits: ["I review my 6-year vision weekly and work backward", "Every daily action connects to a layer of the pyramid", "I hold the vision loosely and execute tightly", "I don't talk about the vision — I let the results speak"]
   },
   {
     emoji: "💰", name: "Income & Revenue", status: "critical", statusLabel: "CRITICAL",
@@ -739,7 +761,12 @@ const pyramidLevels = [
     blockers: ["Haven't delivered paid work in ~1 year", "Not checking finances → spending blindly → vague anxiety", "Avoidance pattern blocking outreach to warm leads"],
     actions: ["Financial audit — real numbers, today", "Reply to Sharad ($4-5K opportunity sitting there)", "Launch $500 quick DD offer as entry point", "Set March goal: $5K (one report, one client)"],
     models: ["Scarcity vs Abundance Mindset", "Clear Offer = Confidence", "80/20 Principle"],
-    color: "#f87171", width: "55%"
+    color: "#f87171", width: "55%",
+    idealIdentity: "\"Money flows to me because I solve real problems for real people. I charge what I'm worth — $200/hr is my floor, not my ceiling.\"",
+    idealStatus: "ABUNDANT", idealStatusClass: "solid",
+    idealSubtitle: "$25K+/mo, multiple revenue streams, financial clarity",
+    idealDetail: "<strong>I know my numbers cold.</strong> Monthly revenue, runway, burn rate — all visible. PE retainers bring recurring income. Quick DDs fill gaps. The API generates passive revenue. I spend intentionally, save aggressively, and invest in growth. Money is a tool, not a source of anxiety.",
+    idealTraits: ["I check my finances weekly — no avoidance, no surprises", "I charge because I care about helping well", "A 'no' to my price isn't a 'no' to my worth", "I have 3+ revenue streams: retainers, reports, API, consulting", "I'm not selling time — I'm selling the years it took to make it look easy"]
   },
   {
     emoji: "🎯", name: "Execution & Delivery", status: "critical", statusLabel: "CRITICAL",
@@ -748,7 +775,12 @@ const pyramidLevels = [
     blockers: ["Avoidance pattern — anything involving someone's expectation feels threatening", "Stakes inflation — gap makes every small task feel huge", "Generalist feeling — hasn't delivered recently so skills feel stale"],
     actions: ["Daily 3: three actions involving another human", "Morning frog: one uncomfortable thing before 9am", "Post week 1 LinkedIn content TODAY", "Send Clay intro, reply to leads"],
     models: ["Momentum Flywheel", "Ship > Perfect", "Avoidance-Shame Spiral", "Stakes Inflation", "Empty Productivity Trap"],
-    color: "#f87171", width: "65%"
+    color: "#f87171", width: "65%",
+    idealIdentity: "\"I ship daily. I respond within hours. I follow through on everything I say I'll do. My word is my reputation.\"",
+    idealStatus: "SHIPPING", idealStatusClass: "solid",
+    idealSubtitle: "Daily content, fast responses, consistent delivery",
+    idealDetail: "<strong>I'm a machine.</strong> Content goes out every week without friction — it's just what I do. Leads get replies the same day. Projects get delivered on time or early. I eat the frog first thing every morning. My inbox is at zero. Nothing festers, nothing piles up. I do the hard thing first because that's who I am.",
+    idealTraits: ["Morning frog before 9am — non-negotiable", "Daily 3: three actions involving another human", "I post weekly — content is queued, publishing is automatic", "Reply time: <24 hours on everything", "Ship > perfect. Done > discussed.", "If it takes <2 min, I do it NOW"]
   },
   {
     emoji: "🧠", name: "Self-Trust & Confidence", status: "cracking", statusLabel: "CRACKING",
@@ -757,7 +789,12 @@ const pyramidLevels = [
     blockers: ["No feedback loop for ~1 year → confidence eroded", "Comparing yourself to confident people around you", "Feeling like a generalist instead of a specialist"],
     actions: ["One paid delivery — any size — to rebuild evidence", "Name your actual skills (energy data, rapid product building, visualization, DD)", "Graduated exposure — small reps proving it's safe"],
     models: ["The Feedback Gap", "Graduated Exposure", "Identity Anchors (Say It Out Loud)", "Growth Mindset", "Self-Compassion as Fuel"],
-    color: "#f59e0b", width: "75%"
+    color: "#f59e0b", width: "75%",
+    idealIdentity: "\"I am one of the best interconnection data analysts in the country. I build faster than anyone I know. When I show up, people get value. Period.\"",
+    idealStatus: "UNSHAKEABLE", idealStatusClass: "solid",
+    idealSubtitle: "Deep expertise, proven track record, quiet confidence",
+    idealDetail: "<strong>I know exactly what I'm good at</strong> and I don't need anyone's praise to believe it. Energy data, rapid product building, data visualization, interconnection analysis — these are my zones of genius. Every delivery adds to the stack of evidence. I don't compare myself to others because I'm running my own race. My confidence comes from reps, not from validation.",
+    idealTraits: ["I name my skills out loud: energy data, rapid building, visualization, DD", "My confidence is earned — built on a stack of deliveries and wins", "I don't need permission to be an expert", "I learn in public and teach what I know", "Imposter syndrome is just proof I'm growing — I acknowledge it and keep going"]
   },
   {
     emoji: "💪", name: "Foundation Systems", status: "cracking", statusLabel: "CRACKING",
@@ -766,7 +803,12 @@ const pyramidLevels = [
     blockers: ["Financial avoidance — not looking at real numbers", "Social isolation — less connected than usual", "Family outreach dropped (half-sister, dad, brother)"],
     actions: ["Pull up bank account — get the REAL numbers today", "Budget: income needed vs current spend vs runway", "One family call this weekend", "Reconnect with 1-2 friends this week"],
     models: ["Non-Negotiables Foundation", "Energy Management > Time Management", "Present Moment Focus", "Calm Mind + Full Speed"],
-    color: "#f59e0b", width: "85%"
+    color: "#f59e0b", width: "85%",
+    idealIdentity: "\"My foundation is unbreakable. Body, mind, money, relationships — all dialed. When the foundation is solid, everything above it flows.\"",
+    idealStatus: "DIALED", idealStatusClass: "solid",
+    idealSubtitle: "Greek god body, finances clear, relationships deep, routines locked",
+    idealDetail: "<strong>Everything is visible and intentional.</strong> I know my bank balance, my burn rate, and my runway without checking. Gym is daily and I look the part — chiseled, strong, healthy. I call my family weekly. I have deep friendships I actively invest in. Morning routine is automatic: up at 5, breathwork, meditation, gym, frog. I don't let anything go invisible — when something's off, I face it immediately.",
+    idealTraits: ["Gym daily — non-negotiable, Greek god in progress", "Sleep 10:30-5:30, 7+ hours every night", "Breathwork + meditation every morning", "Finances reviewed weekly — budget, runway, income tracking", "Family call 1x/week, friend hangs 2x/week", "Eating clean, cooking more, spending intentionally", "When something feels off, I look at it — I don't look away"]
   },
   {
     emoji: "🪨", name: "Nervous System Safety", status: "cracking", statusLabel: "ROOT CAUSE",
@@ -775,58 +817,88 @@ const pyramidLevels = [
     blockers: ["Dad pattern: performance = risk of criticism (OLD belief, not current reality)", "Past client pain: visibility → inbound → no clear offer → stress", "Generalized avoidance: brain treats ALL external expectations as threats"],
     actions: ["Graduated exposure — tiny reps proving it's safe (Clay intro, one reply, one post)", "Breathwork + meditation daily (nervous system regulation)", "Journaling — today's session was exactly this ✅", "Mantra: 'Clear offer. Free compounding. Just post.'", "Name the pattern in real time: 'That's the old wiring, not reality'"],
     models: ["Graduated Exposure", "The Feedback Gap", "Stakes Inflation", "Dichotomy of Control", "The Obstacle Is the Way", "Window of Tolerance", "Voluntary Discomfort"],
-    color: "#f59e0b", width: "95%"
+    color: "#f59e0b", width: "95%",
+    idealIdentity: "\"I am safe to be seen. Visibility is leverage, not exposure. Other people's expectations are opportunities, not threats. I welcome them.\"",
+    idealStatus: "REGULATED", idealStatusClass: "solid",
+    idealSubtitle: "Calm nervous system, safe to be seen, welcomes responsibility",
+    idealDetail: "<strong>My nervous system is my ally, not my enemy.</strong> I breathe. I regulate. I notice when the old pattern fires — and I override it with action, not avoidance. I know the fear of judgment is an old program from childhood, not my current reality. Not everyone criticizes like dad did. Most people are rooting for me. Being in someone's line of expectation is a gift — it means I matter to them. I move toward discomfort because that's where growth lives.",
+    idealTraits: ["I notice the avoidance impulse and name it: 'That's old wiring, not reality'", "I breathe before I react — 3 breaths, then act", "Visibility is leverage. Being seen is how I win.", "Other people's expectations = proof I'm valuable", "I do the uncomfortable thing FIRST — resistance is the compass", "Clear offer. Free compounding. Just post.", "I figure things out. I always have."]
   }
 ];
 
 const pw = document.getElementById('pyramidWrapper');
 let activePyramid = null;
+let pyramidMode = 'current';
 
-// Render bottom-up (reverse so vision is on top)
-pyramidLevels.forEach((level, i) => {
-  if (i > 0) {
-    const conn = document.createElement('div');
-    conn.className = 'pyramid-connector';
-    pw.appendChild(conn);
-  }
-  const el = document.createElement('div');
-  el.className = 'pyramid-level';
-  el.style.setProperty('--level-color', level.color);
-  el.style.width = level.width;
-  el.dataset.index = i;
+function renderPyramid() {
+  pw.innerHTML = '';
+  activePyramid = null;
+  const isIdeal = pyramidMode === 'ideal';
   
-  const blockersHtml = level.blockers.map(b => `<div class="pyramid-blocker">✗ ${b}</div>`).join('');
-  const actionsHtml = level.actions.map(a => `<div class="pyramid-action">→ ${a}</div>`).join('');
-  const modelsHtml = level.models.map(m => `<span class="pyramid-model-tag">${m}</span>`).join('');
-  
-  el.innerHTML = `
-    <div class="pyramid-level-header">
-      <span class="pyramid-emoji">${level.emoji}</span>
-      <span class="pyramid-name">${level.name}</span>
-      <span class="pyramid-status ${level.status}">${level.statusLabel}</span>
-    </div>
-    <div class="pyramid-subtitle">${level.subtitle}</div>
-    <div class="pyramid-expand">
-      <div class="pyramid-detail">${level.detail}</div>
-      <div class="pyramid-blockers">${blockersHtml}</div>
-      <div class="pyramid-actions">${actionsHtml}</div>
-      <div class="pyramid-models">${modelsHtml}</div>
-    </div>
-  `;
-  
-  el.addEventListener('click', () => {
-    if (activePyramid === i) {
-      el.classList.remove('active');
-      activePyramid = null;
-    } else {
-      document.querySelectorAll('.pyramid-level').forEach(p => p.classList.remove('active'));
-      el.classList.add('active');
-      activePyramid = i;
+  pyramidLevels.forEach((level, i) => {
+    if (i > 0) {
+      const conn = document.createElement('div');
+      conn.className = 'pyramid-connector';
+      pw.appendChild(conn);
     }
+    const el = document.createElement('div');
+    el.className = 'pyramid-level' + (isIdeal ? ' pyramid-ideal' : '');
+    el.style.setProperty('--level-color', isIdeal ? '#6ee7b7' : level.color);
+    el.style.width = level.width;
+    el.dataset.index = i;
+    
+    const st = isIdeal ? level.idealStatus : level.status;
+    const stLabel = isIdeal ? level.idealStatusLabel : level.statusLabel;
+    const stClass = isIdeal ? (level.idealStatusClass || 'solid') : level.status;
+    const sub = isIdeal ? level.idealSubtitle : level.subtitle;
+    
+    let expandHtml = '';
+    if (isIdeal) {
+      const identity = `<div class="pyramid-identity">${level.idealIdentity}</div>`;
+      const detail = `<div class="pyramid-detail">${level.idealDetail}</div>`;
+      const traits = level.idealTraits.map(t => `<div class="pyramid-action">✦ ${t}</div>`).join('');
+      const modelsHtml = level.models.map(m => `<span class="pyramid-model-tag">${m}</span>`).join('');
+      expandHtml = `${identity}${detail}<div class="pyramid-actions">${traits}</div><div class="pyramid-models">${modelsHtml}</div>`;
+    } else {
+      const blockersHtml = level.blockers.map(b => `<div class="pyramid-blocker">✗ ${b}</div>`).join('');
+      const actionsHtml = level.actions.map(a => `<div class="pyramid-action">→ ${a}</div>`).join('');
+      const modelsHtml = level.models.map(m => `<span class="pyramid-model-tag">${m}</span>`).join('');
+      expandHtml = `<div class="pyramid-detail">${level.detail}</div><div class="pyramid-blockers">${blockersHtml}</div><div class="pyramid-actions">${actionsHtml}</div><div class="pyramid-models">${modelsHtml}</div>`;
+    }
+    
+    el.innerHTML = `
+      <div class="pyramid-level-header">
+        <span class="pyramid-emoji">${level.emoji}</span>
+        <span class="pyramid-name">${level.name}</span>
+        <span class="pyramid-status ${stClass}">${isIdeal ? level.idealStatus : level.statusLabel}</span>
+      </div>
+      <div class="pyramid-subtitle">${sub}</div>
+      <div class="pyramid-expand">${expandHtml}</div>
+    `;
+    
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.index);
+      if (activePyramid === idx) {
+        el.classList.remove('active');
+        activePyramid = null;
+      } else {
+        document.querySelectorAll('.pyramid-level').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        activePyramid = idx;
+      }
+    });
+    
+    pw.appendChild(el);
   });
-  
-  pw.appendChild(el);
-});
+}
+
+function setPyramidMode(mode) {
+  pyramidMode = mode;
+  document.querySelectorAll('.pyramid-toggle').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  renderPyramid();
+}
+
+renderPyramid();
 
 // Random Wisdom
 function randomWisdom() {
