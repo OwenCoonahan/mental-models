@@ -337,6 +337,89 @@ header p { color: var(--text-muted); font-size: 15px; }
 .wisdom-name { font-weight: 600; color: var(--gold); }
 .wisdom-close { cursor: pointer; color: var(--text-dim); padding: 4px; }
 
+/* Life Pyramid */
+.pyramid-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 32px 0 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.pyramid-level {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  background: var(--card);
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  margin-bottom: -1px;
+}
+.pyramid-level:hover { background: var(--card-hover); border-color: var(--border-light); z-index: 2; }
+.pyramid-level.active { border-color: var(--level-color); z-index: 3; }
+.pyramid-level.active .pyramid-expand { display: block; }
+.pyramid-level-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.pyramid-emoji { font-size: 20px; }
+.pyramid-name { font-weight: 600; font-size: 15px; }
+.pyramid-status {
+  font-size: 11px;
+  font-family: 'Geist Mono', monospace;
+  padding: 2px 8px;
+  border-radius: 100px;
+  border: 1px solid;
+}
+.pyramid-status.solid { color: var(--stoic); border-color: var(--stoic-muted); background: rgba(110,231,183,0.08); }
+.pyramid-status.cracking { color: var(--gold); border-color: var(--gold-muted); background: var(--gold-bg); }
+.pyramid-status.critical { color: #f87171; border-color: #7f1d1d; background: rgba(248,113,113,0.08); }
+.pyramid-status.building { color: var(--action); border-color: var(--action-muted); background: rgba(59,130,246,0.08); }
+.pyramid-subtitle { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.pyramid-expand {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  text-align: left;
+}
+.pyramid-detail { font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 8px; }
+.pyramid-detail strong { color: var(--text); }
+.pyramid-blockers { margin-top: 10px; }
+.pyramid-blocker {
+  font-size: 12px;
+  color: #f87171;
+  font-family: 'Geist Mono', monospace;
+  padding: 2px 0;
+}
+.pyramid-actions { margin-top: 10px; }
+.pyramid-action {
+  font-size: 12px;
+  color: var(--stoic);
+  font-family: 'Geist Mono', monospace;
+  padding: 2px 0;
+}
+.pyramid-models { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+.pyramid-model-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--bg);
+}
+.pyramid-connector {
+  width: 2px;
+  height: 12px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -368,12 +451,15 @@ header p { color: var(--text-muted); font-size: 15px; }
 <div class="container">
   <header>
     <h1>Mental Models Map</h1>
-    <p>64 models — your personal operating system</p>
+    <p>69 models — your personal operating system</p>
     <div class="header-actions">
       <button class="btn" onclick="openSearch()">🔍 Search <kbd>⌘K</kbd></button>
       <button class="btn" onclick="randomWisdom()">✦ Random Wisdom</button>
     </div>
   </header>
+
+  <div class="section-title">🔺 Owen's Life Pyramid — bottom up, fix the foundation first</div>
+  <div class="pyramid-wrapper" id="pyramidWrapper"></div>
 
   <div class="section-title">⚡ Quick Triggers — "I'm feeling X → reach for Y"</div>
   <div class="trigger-grid" id="triggerGrid"></div>
@@ -468,10 +554,15 @@ const models = [
   {id:62,name:"Present Moment Focus",cat:"Wisdom",insight:"You only ever have to handle THIS moment. And you can always handle this moment.",when:"Ruminating, catastrophizing, spiraling.",owned:true,clusters:["foundation"]},
   {id:63,name:"Empty Productivity Trap",cat:"Wisdom",insight:"If it's not outreach, closing, or building something a client would pay for — it's not needle-moving work. Everything else is maintenance or play. Name it honestly.",when:"You've been 'working' all day but can't name one thing that could lead to money in your account.",owned:true,clusters:["action","builder"]},
   {id:64,name:"Environmental Mimicry Trap",cat:"Wisdom",insight:"Most people performing hustle aren't winning — they're coping. The ones actually building wealth work fewer focused hours, play more, and look calm. Mimic them, not the grinders.",when:"You're staying late because everyone else is, or doing what looks impressive rather than what's effective.",owned:true,clusters:["identity","builder"]},
+  {id:65,name:"Momentum Flywheel",cat:"Wisdom",insight:"Momentum isn't motivation — it's physics. Each rep lowers friction for the next. One action makes the second easier, the second makes the third automatic. Stop, and static friction returns.",when:"You've been out of the game, feeling stuck, or restarting after a gap. The first rep is the hardest — do it anyway.",owned:true,clusters:["action","foundation"]},
+  {id:66,name:"Graduated Exposure",cat:"Psychology",insight:"You don't rehab an injury by deadlifting 400. You rebuild trust with your nervous system one small rep at a time. Each rep recalibrates your brain's threat assessment downward.",when:"Something small (a text, an intro, a reply) feels disproportionately scary. That's a signal to do it, not avoid it.",owned:true,clusters:["action","inner"]},
+  {id:67,name:"The Feedback Gap",cat:"Psychology",insight:"Confidence is perishable — it needs reps to stay fresh. Without external feedback (praise, payment, results), your internal sense of competence fades. Not because you lost skills, but because the muscle hasn't been used.",when:"You feel like a generalist, stale, or like you've lost your edge. You haven't — you just need one at-bat.",owned:true,clusters:["identity","action"]},
+  {id:68,name:"Stakes Inflation",cat:"Psychology",insight:"The longer the gap between actions, the higher the imaginary stakes. A 30-second text becomes a referendum on your competence. The cure is closing the gap — any action, any size.",when:"A simple task feels impossibly heavy. That's not the task — that's the gap talking.",owned:true,clusters:["action","inner"]},
+  {id:69,name:"Clear Offer = Confidence",cat:"Entrepreneurial Wisdom",insight:"Most 'fear of selling' is actually fear of delivering something vague. When the offer is crystal clear — buyer, price, deliverable, scope — confidence follows automatically. Clarity kills anxiety.",when:"You're avoiding outreach, sales, or posting because you feel unsure what you're even offering.",owned:true,clusters:["builder","identity"]},
 ];
 
 const clusters = [
-  {id:"action",name:"The Action Cluster",sub:"when you can't start",color:"#3b82f6",models:["10-Second Hype Before Action","Behavioral Activation","Avoidance-Shame Spiral","Ship > Perfect","Momentum = Positive Loops"]},
+  {id:"action",name:"The Action Cluster",sub:"when you can't start",color:"#3b82f6",models:["10-Second Hype Before Action","Behavioral Activation","Avoidance-Shame Spiral","Ship > Perfect","Momentum = Positive Loops","Momentum Flywheel","Graduated Exposure","The Feedback Gap","Stakes Inflation"]},
   {id:"inner",name:"The Inner Game",sub:"when the critic is loud",color:"#a78bfa",models:["CBT — Thought Records","Cognitive Distortions","Defusion (ACT)","Self-Compassion as Fuel","Praise Before Criticism","Identity Anchors (Say It Out Loud)"]},
   {id:"stoic",name:"The Stoic Backbone",sub:"when life hits hard",color:"#6ee7b7",models:["Dichotomy of Control","Amor Fati","The Obstacle Is the Way","Memento Mori","The Inner Citadel","Logotherapy (Frankl)"]},
   {id:"builder",name:"The Builder Cluster",sub:"when building feels overwhelming",color:"#f472b6",models:["First Principles Thinking","Lean Startup / Build-Measure-Learn","80/20 Principle","Ship > Perfect","Calm Mind + Full Speed","Deep Work"]},
@@ -492,7 +583,10 @@ const triggers = [
   {feeling:"Ego inflated or deflated",models:"⭐ Ego Is the Enemy, View From Above, Prototype Mindset"},
   {feeling:"Low energy / burned out",models:"⭐ Non-Negotiables, Energy Mgmt, Ultradian Rhythms"},
   {feeling:"Avoiding something",models:"⭐ Avoidance-Shame Spiral, Second-Order Thinking"},
-  {feeling:"Everything feels pointless",models:"Memento Mori, Logotherapy, ⭐ Momentum"},
+  {feeling:"Everything feels pointless",models:"Memento Mori, Logotherapy, ⭐ Momentum Flywheel"},
+  {feeling:"Stale / lost my edge",models:"⭐ The Feedback Gap, ⭐ Stakes Inflation, Graduated Exposure"},
+  {feeling:"Small tasks feel huge",models:"⭐ Stakes Inflation, ⭐ Graduated Exposure, ⭐ Avoidance-Shame Spiral"},
+  {feeling:"Afraid to sell / post",models:"⭐ Clear Offer = Confidence, Spotlight Effect, ⭐ Momentum Flywheel"},
   {feeling:"Busy but nothing moved",models:"⭐ Empty Productivity Trap, 80/20, Deep Work, Essentialism"},
   {feeling:"Mimicking the grind",models:"⭐ Environmental Mimicry Trap, ⭐ Ego Is the Enemy, ⭐ Calm Mind + Full Speed"},
 ];
@@ -602,7 +696,7 @@ document.getElementById('searchInput').addEventListener('input', e => renderSear
 
 function renderSearchResults(q) {
   const r = document.getElementById('searchResults');
-  if (!q.trim()) { r.innerHTML = '<div class="search-empty">Type to search 64 models...</div>'; return; }
+  if (!q.trim()) { r.innerHTML = '<div class="search-empty">Type to search 69 models...</div>'; return; }
   const ql = q.toLowerCase();
   const matches = models.filter(m => m.name.toLowerCase().includes(ql) || m.insight.toLowerCase().includes(ql) || m.when.toLowerCase().includes(ql) || m.cat.toLowerCase().includes(ql));
   if (!matches.length) { r.innerHTML = '<div class="search-empty">No models found</div>'; return; }
@@ -626,6 +720,113 @@ function goToModel(id) {
     setTimeout(() => card.style.boxShadow = '', 2000);
   }, 100);
 }
+
+// Life Pyramid
+const pyramidLevels = [
+  {
+    emoji: "🏔️", name: "Vision & Freedom", status: "building", statusLabel: "WAITING",
+    subtitle: "The life you're building toward",
+    detail: "<strong>6-year vision:</strong> Multi-millionaire, real estate portfolio, location freedom (NYC or CA), married with kids, personal brand, projects that matter. <strong>1-year:</strong> Validated offer, financial control, dating more, great body, abundance mindset.",
+    blockers: ["Every layer below this needs to stabilize first", "Can't build the vision on a shaky foundation"],
+    actions: ["Build the 10/5/1/6yr plan with exact metrics + funnel math", "Revisit monthly — is the pyramid getting stronger?"],
+    models: ["Logotherapy (Frankl)", "Be > Do > Have", "Second-Order Thinking"],
+    color: "#a78bfa", width: "45%"
+  },
+  {
+    emoji: "💰", name: "Income & Revenue", status: "critical", statusLabel: "CRITICAL",
+    subtitle: "$4K/mo covers NYC. One client = freedom.",
+    detail: "<strong>Reality:</strong> Not much income coming in. Inherited IRA as runway — should grow it, not live off it. $1,800 rent + ~$2K living = ~$4K/mo needed. <strong>The math:</strong> 4 quick DDs ($500) = rent. 1 full analysis ($4K) = month covered. 20hrs consulting ($200/hr) = month covered. This is CLOSE, not far.",
+    blockers: ["Haven't delivered paid work in ~1 year", "Not checking finances → spending blindly → vague anxiety", "Avoidance pattern blocking outreach to warm leads"],
+    actions: ["Financial audit — real numbers, today", "Reply to Sharad ($4-5K opportunity sitting there)", "Launch $500 quick DD offer as entry point", "Set March goal: $5K (one report, one client)"],
+    models: ["Scarcity vs Abundance Mindset", "Clear Offer = Confidence", "80/20 Principle"],
+    color: "#f87171", width: "55%"
+  },
+  {
+    emoji: "🎯", name: "Execution & Delivery", status: "critical", statusLabel: "CRITICAL",
+    subtitle: "Posting, outreach, delivering, following through",
+    detail: "<strong>The gap:</strong> You have 12 weeks of content queued but haven't posted week 1. Warm leads (Sharad, Harshwardhan, Andrew, Reagan) waiting for replies. The skills exist — the reps don't. <strong>What changed:</strong> You now have a clear offer (interconnection data for energy investors). The old pain was from vagueness.",
+    blockers: ["Avoidance pattern — anything involving someone's expectation feels threatening", "Stakes inflation — gap makes every small task feel huge", "Generalist feeling — hasn't delivered recently so skills feel stale"],
+    actions: ["Daily 3: three actions involving another human", "Morning frog: one uncomfortable thing before 9am", "Post week 1 LinkedIn content TODAY", "Send Clay intro, reply to leads"],
+    models: ["Momentum Flywheel", "Ship > Perfect", "Avoidance-Shame Spiral", "Stakes Inflation", "Empty Productivity Trap"],
+    color: "#f87171", width: "65%"
+  },
+  {
+    emoji: "🧠", name: "Self-Trust & Confidence", status: "cracking", statusLabel: "CRACKING",
+    subtitle: "Belief that you can deliver, that showing up is safe",
+    detail: "<strong>The truth:</strong> You built 96 API endpoints, 12+ dashboards, won hackathons, have deep interconnection knowledge. The skills are real. But without recent paid delivery reps, your brain discounts all of it. No praise = must not be valuable. <strong>That's not true</strong> — it just means you've been building in isolation. One delivery rebuilds everything.",
+    blockers: ["No feedback loop for ~1 year → confidence eroded", "Comparing yourself to confident people around you", "Feeling like a generalist instead of a specialist"],
+    actions: ["One paid delivery — any size — to rebuild evidence", "Name your actual skills (energy data, rapid product building, visualization, DD)", "Graduated exposure — small reps proving it's safe"],
+    models: ["The Feedback Gap", "Graduated Exposure", "Identity Anchors (Say It Out Loud)", "Growth Mindset", "Self-Compassion as Fuel"],
+    color: "#f59e0b", width: "75%"
+  },
+  {
+    emoji: "💪", name: "Foundation Systems", status: "cracking", statusLabel: "CRACKING",
+    subtitle: "Finances visible, body right, routines locked, relationships fed",
+    detail: "<strong>What's solid:</strong> Gym daily ✅, eating well ✅, sleep schedule ✅, morning routine ✅, breathwork discovered ✅. <strong>What's cracking:</strong> Not checking finances → overspending → vague money anxiety. Social life decreased. Haven't called family enough. Skills feel stale from disuse.",
+    blockers: ["Financial avoidance — not looking at real numbers", "Social isolation — less connected than usual", "Family outreach dropped (half-sister, dad, brother)"],
+    actions: ["Pull up bank account — get the REAL numbers today", "Budget: income needed vs current spend vs runway", "One family call this weekend", "Reconnect with 1-2 friends this week"],
+    models: ["Non-Negotiables Foundation", "Energy Management > Time Management", "Present Moment Focus", "Calm Mind + Full Speed"],
+    color: "#f59e0b", width: "85%"
+  },
+  {
+    emoji: "🪨", name: "Nervous System Safety", status: "cracking", statusLabel: "ROOT CAUSE",
+    subtitle: "Feeling SAFE to be seen, perform, and be in someone's line of expectation",
+    detail: "<strong>The root:</strong> Dad's criticism pattern encoded 'performance for others = risk of pain.' Then bad client experiences (no clear offer → scope creep → stress) reinforced it. Your nervous system generalized: ANY action involving someone else's expectation = threat. Even a 30-second text intro triggers it. <strong>This is Layer 1.</strong> Everything above depends on this feeling safe.",
+    blockers: ["Dad pattern: performance = risk of criticism (OLD belief, not current reality)", "Past client pain: visibility → inbound → no clear offer → stress", "Generalized avoidance: brain treats ALL external expectations as threats"],
+    actions: ["Graduated exposure — tiny reps proving it's safe (Clay intro, one reply, one post)", "Breathwork + meditation daily (nervous system regulation)", "Journaling — today's session was exactly this ✅", "Mantra: 'Clear offer. Free compounding. Just post.'", "Name the pattern in real time: 'That's the old wiring, not reality'"],
+    models: ["Graduated Exposure", "The Feedback Gap", "Stakes Inflation", "Dichotomy of Control", "The Obstacle Is the Way", "Window of Tolerance", "Voluntary Discomfort"],
+    color: "#f59e0b", width: "95%"
+  }
+];
+
+const pw = document.getElementById('pyramidWrapper');
+let activePyramid = null;
+
+// Render bottom-up (reverse so vision is on top)
+pyramidLevels.forEach((level, i) => {
+  if (i > 0) {
+    const conn = document.createElement('div');
+    conn.className = 'pyramid-connector';
+    pw.appendChild(conn);
+  }
+  const el = document.createElement('div');
+  el.className = 'pyramid-level';
+  el.style.setProperty('--level-color', level.color);
+  el.style.width = level.width;
+  el.dataset.index = i;
+  
+  const blockersHtml = level.blockers.map(b => `<div class="pyramid-blocker">✗ ${b}</div>`).join('');
+  const actionsHtml = level.actions.map(a => `<div class="pyramid-action">→ ${a}</div>`).join('');
+  const modelsHtml = level.models.map(m => `<span class="pyramid-model-tag">${m}</span>`).join('');
+  
+  el.innerHTML = `
+    <div class="pyramid-level-header">
+      <span class="pyramid-emoji">${level.emoji}</span>
+      <span class="pyramid-name">${level.name}</span>
+      <span class="pyramid-status ${level.status}">${level.statusLabel}</span>
+    </div>
+    <div class="pyramid-subtitle">${level.subtitle}</div>
+    <div class="pyramid-expand">
+      <div class="pyramid-detail">${level.detail}</div>
+      <div class="pyramid-blockers">${blockersHtml}</div>
+      <div class="pyramid-actions">${actionsHtml}</div>
+      <div class="pyramid-models">${modelsHtml}</div>
+    </div>
+  `;
+  
+  el.addEventListener('click', () => {
+    if (activePyramid === i) {
+      el.classList.remove('active');
+      activePyramid = null;
+    } else {
+      document.querySelectorAll('.pyramid-level').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      activePyramid = i;
+    }
+  });
+  
+  pw.appendChild(el);
+});
 
 // Random Wisdom
 function randomWisdom() {
